@@ -1,5 +1,8 @@
 package edu.unc.lib.premistest.premistest;
 
+import static com.hp.hpl.jena.rdf.model.ResourceFactory.createProperty;
+import static com.hp.hpl.jena.rdf.model.ResourceFactory.createResource;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -8,7 +11,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.UUID;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
 import org.fcrepo.client.FcrepoClient;
 import org.fcrepo.client.FcrepoOperationFailedException;
 import org.fcrepo.client.FcrepoResponse;
@@ -23,6 +30,8 @@ import org.junit.Test;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.Resource;
 
 import edu.unc.lib.dl.xml.JDOMNamespaceUtil;
 
@@ -41,13 +50,19 @@ public class PremisPerformanceTest {
 	XMLOutputter out;
 	SAXBuilder builder;
 	
+	private static String EVENT_URI_PREFIX = "http://repository.example/";
+	private static Resource clamAgent = createResource("http://cdr.lib.unc.edu/agent/software/ClamAV");
+	
+	public static final Property executingAgentRole = createProperty("http://id.loc.gov/vocabulary/preservation/eventRelatedAgentRole/exe");
+	public static final Property relatedObjectSource = createProperty("http://id.loc.gov/ml38281/vocabulary/preservation/eventRelatedObjectRole/sou");
+	
 	public PremisPerformanceTest() {
 		client = FcrepoClient.client()
 				.throwExceptionOnFailure()
 				.build();
 		
 		TimeZone tz = TimeZone.getTimeZone("UTC");
-		df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
+		df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
 		df.setTimeZone(tz);
 		
 		out = new XMLOutputter();
@@ -63,14 +78,66 @@ public class PremisPerformanceTest {
 	}
 	
 	@Test
-	public void rdfFile() {
+	public void rdfFile() throws IOException, FcrepoOperationFailedException {
 		
-		Model eventModel = ModelFactory.createDefaultModel();
+		// Create the log object
+		URI logUri = null;
+		try (FcrepoResponse resp = client.post(objUri)
+				.body(new ByteArrayInputStream("".getBytes()), "text/plain")
+				.perform()) {
+			logUri = resp.getLocation();
+		}
 		
-		String uuid = String.format("urn:uuid:%1$s", java.util.UUID.randomUUID());
-		// 
+		for (int i = 0; i < 4; i++) {
+			// Retrieve log object
+			String logBody = retrieveRDFLog(logUri);
+			
+			// create new entry
+			Resource premisObjResc = createRDFEvent();
+
+			// Add log entry to file
+			try (ByteArrayOutputStream outStream = new ByteArrayOutputStream()) {
+				RDFDataMgr.write(outStream, premisObjResc.getModel(), RDFFormat.TURTLE_PRETTY);
+				String eventString = outStream.toString("UTF-8");
+				
+				logBody += eventString;
+			}
+			
+			// Stream log object back to fedora
+			try (FcrepoResponse resp = client.put(logUri)
+					.body(new ByteArrayInputStream(logBody.getBytes()), "text/plain")
+					.perform()) {
+			}
+		}
 		
+		System.out.println(objUri);
+	}
+	
+	private Resource createRDFEvent() {
+		String eventId = UUID.randomUUID().toString();
 		
+		Model model = ModelFactory.createDefaultModel();
+		Resource premisObjResc = model.createResource(EVENT_URI_PREFIX + eventId);
+
+		premisObjResc.addProperty(Premis.hasEventType, "http://id.loc.gov/vocabulary/preservationEvents/virusCheck");
+		premisObjResc.addProperty(Premis.hasEventDateTime, df.format(new Date()));
+		premisObjResc.addProperty(Premis.hasEventOutcomeDetail, "File passed preriodic scan for viruses");
+		
+		Resource eventOutcomeInfo = model.createResource(EVENT_URI_PREFIX + "outcome/" + eventId);
+		eventOutcomeInfo.addProperty(Premis.hasEventOutcome, "Success");
+		premisObjResc.addProperty(Premis.hasEventOutcomeInformation, eventOutcomeInfo);
+		
+		premisObjResc.addProperty(executingAgentRole, clamAgent);
+		premisObjResc.addProperty(relatedObjectSource, "http://cdr.lib.unc.edu/objects/uuid:d1b44f02-2d11-4589-b81d-3575d85353e1/DATA_FILE");
+		
+		return premisObjResc;
+	}
+	
+	private String retrieveRDFLog(URI logUri) throws IOException, FcrepoOperationFailedException {
+		try (FcrepoResponse resp = client.get(logUri)
+				.perform()) {
+			return IOUtils.toString(resp.getBody());
+		}
 	}
 	
 	@Test
