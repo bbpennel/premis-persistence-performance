@@ -50,6 +50,7 @@ public class PremisPerformanceTest {
     
     boolean warmingUp;
     
+    URI runContainerUri;
     URI objUri;
     
     DateFormat df;
@@ -114,13 +115,13 @@ public class PremisPerformanceTest {
         try (FcrepoResponse response = client.post(URI.create(fcrepoBase))
                 .slug(container)
                 .perform()) {
-            objUri = response.getLocation();
+            runContainerUri = response.getLocation();
         } catch (FcrepoOperationFailedException e) {
         }
     }
     
     private void createBaseObject(String container) throws IOException, FcrepoOperationFailedException {
-        try (FcrepoResponse response = client.post(URI.create(fcrepoBase + container))
+        try (FcrepoResponse response = client.post(runContainerUri)
                 .perform()) {
             objUri = response.getLocation();
         }
@@ -143,7 +144,7 @@ public class PremisPerformanceTest {
         rdfFile(numEvents, numObjs);
     }
     
-    @Test
+//    @Test
     public void objs1Events10() throws Exception {
         
         int numObjs = 1;
@@ -221,30 +222,30 @@ public class PremisPerformanceTest {
         int numObjs = 10000;
         int numEvents = 10;
         
-        startServer();
-        rdfFile(numEvents, numObjs);
-        stopServer();
-        startServer();
-        ldpObjs(numEvents, numObjs);
+//        startServer();
+//        rdfFile(numEvents, numObjs);
+//        stopServer();
+//        startServer();
+//        ldpObjs(numEvents, numObjs);
+//        stopServer();
+//        startServer();
+//        hashUris(numEvents, numObjs);
+//        stopServer();
+//        startServer();
+//        xmlFile(numEvents, numObjs);
+//        stopServer();
+//        startServer();
+        xmlFile(numEvents, numObjs);
         stopServer();
         startServer();
         hashUris(numEvents, numObjs);
         stopServer();
         startServer();
-        xmlFile(numEvents, numObjs);
-        stopServer();
-        startServer();
-        xmlFile(numEvents, numObjs);
-        stopServer();
-        startServer();
-        hashUris(numEvents, numObjs);
-        stopServer();
-        startServer();
         ldpObjs(numEvents, numObjs);
         stopServer();
         startServer();
         rdfFile(numEvents, numObjs);
-        stopServer();
+//        stopServer();
     }
     
 //    @Test

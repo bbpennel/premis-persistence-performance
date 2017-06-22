@@ -3,6 +3,7 @@ package edu.unc.lib.premistest.premistest;
 import java.io.File;
 import java.net.URI;
 
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.commons.io.FileUtils;
 import org.fcrepo.client.FcrepoClient;
@@ -58,7 +59,17 @@ public class FcrepoTomcatWrapper {
         // System.out.println(warFile.getAbsolutePath());
         tomcat.addWebapp("/fcrepo", warFile.getAbsolutePath());
 
-        tomcat.start();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    tomcat.start();
+                } catch (LifecycleException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+        
         
         FcrepoClient client = FcrepoClient.client()
                 .throwExceptionOnFailure()
