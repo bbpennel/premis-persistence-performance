@@ -12,10 +12,17 @@ import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PremisTest {
-    private static final Logger log = LoggerFactory.getLogger(PremisTest.class);
+import edu.unc.lib.premistest.generators.AbstractPremisPersistenceGenerator;
+import edu.unc.lib.premistest.generators.EventObjectsGenerator;
+import edu.unc.lib.premistest.generators.HashUriEventsGenerator;
+import edu.unc.lib.premistest.generators.RdfLogGenerator;
+import edu.unc.lib.premistest.generators.XmlLogGenerator;
+
+public class PremisPersistenceTest {
+    private static final Logger log = LoggerFactory.getLogger(PremisPersistenceTest.class);
     
     public static void main(String[] args) throws ParseException {
+        System.out.println("Starting premis performance testing");
         Options options = populateOptions();
         
         CommandLineParser parser = new DefaultParser();
@@ -24,9 +31,11 @@ public class PremisTest {
         TestConfig config = extractTestConfig(cmd);
         
         testList(cmd, config).forEach(generator -> {
+            System.out.println("Perform test " + generator.getTestName());
             try {
-                generator.populateObjects();
+                generator.run();
             } catch (Exception e) {
+                e.printStackTrace();
                 log.error("Failed to perform test {}", generator.getTestName(), e);
             }
         });
@@ -44,7 +53,7 @@ public class PremisTest {
         options.addOption("X", false, "Run XML Log File test");
         options.addOption("H", false, "Run Events as Hash URIs test");
         options.addOption("N", false, "Number of times to repeat tests.  Default 1.");
-        options.addOption("s", true, "Silent mode, do not log any results");
+        options.addOption("s", false, "Silent mode, do not log any results");
         
         return options;
     }

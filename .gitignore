@@ -2,3 +2,4 @@ target
 tomcat*
 *.log
 .classpath
+downloads/*

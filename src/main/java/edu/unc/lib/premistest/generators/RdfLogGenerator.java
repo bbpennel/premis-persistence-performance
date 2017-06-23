@@ -1,4 +1,19 @@
-package edu.unc.lib.premistest;
+/**
+ * Copyright 2017 The University of North Carolina at Chapel Hill
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package edu.unc.lib.premistest.generators;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -12,19 +27,30 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.fcrepo.client.FcrepoOperationFailedException;
 import org.fcrepo.client.FcrepoResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import edu.unc.lib.premistest.PremisTest.TestConfig;
+import edu.unc.lib.premistest.PremisPersistenceTest.TestConfig;
 
+/**
+ * 
+ * @author bbpennel
+ *
+ */
 public class RdfLogGenerator extends AbstractPremisPersistenceGenerator {
 
+    private static final Logger log = LoggerFactory.getLogger(RdfLogGenerator.class);
+    
     public RdfLogGenerator(TestConfig config) {
         super(config);
     }
 
     @Override
     protected void populateObjects() throws Exception {
+        System.out.println("Populating " + config.numEvents + " " + config.numObjects);
         for (int objCnt = 0; objCnt < config.numObjects; objCnt++) {
-            //System.out.println("Obj " + objCnt);
+            System.out.println("Obj " + objCnt);
+            log.debug("Obj {}", objCnt);
             URI objectUri = createPreservedObject();
             
             // Create the log object
@@ -60,7 +86,7 @@ public class RdfLogGenerator extends AbstractPremisPersistenceGenerator {
                 }
             }
             
-            // System.out.println(objUri);
+            System.out.println(objectUri);
         }
     }
 
@@ -72,7 +98,7 @@ public class RdfLogGenerator extends AbstractPremisPersistenceGenerator {
     }
     
     @Override
-    protected String getTestName() {
+    public String getTestName() {
         return "rdf_log";
     }
 

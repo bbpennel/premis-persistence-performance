@@ -1,4 +1,19 @@
-package edu.unc.lib.premistest;
+/**
+ * Copyright 2017 The University of North Carolina at Chapel Hill
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package edu.unc.lib.premistest.generators;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -15,8 +30,13 @@ import org.jdom2.Namespace;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
 
-import edu.unc.lib.premistest.PremisTest.TestConfig;
+import edu.unc.lib.premistest.PremisPersistenceTest.TestConfig;
 
+/**
+ * 
+ * @author bbpennel
+ *
+ */
 public class XmlLogGenerator extends AbstractPremisPersistenceGenerator {
     public static final String PREMIS_V2_PREFIX = "premis";
     public static final String PREMIS_V2_URI = "info:lc/xmlns/premis-v2";
@@ -26,7 +46,7 @@ public class XmlLogGenerator extends AbstractPremisPersistenceGenerator {
     XMLOutputter out;
     SAXBuilder builder;
 
-    protected XmlLogGenerator(TestConfig config) {
+    public XmlLogGenerator(TestConfig config) {
         super(config);
         
         out = new XMLOutputter();
@@ -68,7 +88,7 @@ public class XmlLogGenerator extends AbstractPremisPersistenceGenerator {
     }
 
     @Override
-    protected String getTestName() {
+    public String getTestName() {
         return "xml_log";
     }
     

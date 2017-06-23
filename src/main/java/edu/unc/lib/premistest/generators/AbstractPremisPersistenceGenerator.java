@@ -1,4 +1,19 @@
-package edu.unc.lib.premistest;
+/**
+ * Copyright 2017 The University of North Carolina at Chapel Hill
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package edu.unc.lib.premistest.generators;
 
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
@@ -18,9 +33,14 @@ import org.fcrepo.client.FcrepoClient;
 import org.fcrepo.client.FcrepoOperationFailedException;
 import org.fcrepo.client.FcrepoResponse;
 
-import edu.unc.lib.premistest.PremisTest.TestConfig;
+import edu.unc.lib.premistest.PremisPersistenceTest.TestConfig;
 import edu.unc.lib.premistest.premistest.Premis;
 
+/**
+ * 
+ * @author bbpennel
+ *
+ */
 public abstract class AbstractPremisPersistenceGenerator {
     
     protected static Resource clamAgent = createResource("http://cdr.lib.unc.edu/agent/software/ClamAV");
@@ -38,6 +58,10 @@ public abstract class AbstractPremisPersistenceGenerator {
     
     protected AbstractPremisPersistenceGenerator(TestConfig config) {
         this.config = config;
+        
+        client = FcrepoClient.client()
+              .throwExceptionOnFailure()
+              .build();
         
         TimeZone tz = TimeZone.getTimeZone("UTC");
         df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
@@ -58,7 +82,7 @@ public abstract class AbstractPremisPersistenceGenerator {
     
     protected abstract void populateObjects() throws Exception;
     
-    protected abstract String getTestName();
+    public abstract String getTestName();
     
     protected void createRunContainer(String container) throws IOException {
         try (FcrepoResponse response = client.post(URI.create(config.fedoraUrl))
