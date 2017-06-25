@@ -6,30 +6,18 @@
       <pattern>%p %d{HH:mm:ss.SSS} \(%c{0}\) %m%n</pattern>
     </encoder>
   </appender>
-
-  <logger name="org.fcrepo.auth" additivity="false" level="${fcrepo.log.auth:-null}">
-    <appender-ref ref="STDOUT"/>
-  </logger>
-  <logger name="org.fcrepo.http.api" additivity="false" level="${fcrepo.log.http.api:-null}">
-    <appender-ref ref="STDOUT"/>
-  </logger>
-  <logger name="org.fcrepo.http.commons" additivity="false" level="${fcrepo.log.http.commons:-null}">
-    <appender-ref ref="STDOUT"/>
-  </logger>
-  <logger name="org.fcrepo.jms" additivity="false" level="${fcrepo.log.jms:-null}">
-    <appender-ref ref="STDOUT"/>
-  </logger>
-  <logger name="org.fcrepo.kernel" additivity="false" level="${fcrepo.log.kernel:-null}">
-    <appender-ref ref="STDOUT"/>
-  </logger>
-  <logger name="org.fcrepo" additivity="false" level="${fcrepo.log:-null}">
-    <appender-ref ref="STDOUT"/>
-  </logger>
   
-  <logger name="org.apache" additivity="false" level="null">
+  <appender name="RESULTS" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%m%n</pattern>
+    </encoder>
+  </appender>
+
+  <logger name="edu.unc.lib.premistest" additivity="false" level="INFO">
+    <appender-ref ref="RESULTS"/>
   </logger>
 
-  <root level="OFF">
+  <root level="ERROR">
     <appender-ref ref="STDOUT"/>
   </root>
 </configuration>

@@ -22,7 +22,7 @@ public class PremisPersistenceTest {
     private static final Logger log = LoggerFactory.getLogger(PremisPersistenceTest.class);
     
     public static void main(String[] args) throws ParseException {
-        System.out.println("Starting premis performance testing");
+        log.debug("Starting premis performance testing");
         Options options = populateOptions();
         
         CommandLineParser parser = new DefaultParser();
@@ -31,7 +31,7 @@ public class PremisPersistenceTest {
         TestConfig config = extractTestConfig(cmd);
         
         testList(cmd, config).forEach(generator -> {
-            System.out.println("Perform test " + generator.getTestName());
+            log.debug("Performing test {}", generator.getTestName());
             try {
                 generator.run();
             } catch (Exception e) {
@@ -52,7 +52,8 @@ public class PremisPersistenceTest {
         options.addOption("O", false, "Run Events as Objects test");
         options.addOption("X", false, "Run XML Log File test");
         options.addOption("H", false, "Run Events as Hash URIs test");
-        options.addOption("N", false, "Number of times to repeat tests.  Default 1.");
+        options.addOption("N", true, "Number of times to repeat tests.  Default 1.");
+        options.addOption("A", false, "Run all persistence tests");
         options.addOption("s", false, "Silent mode, do not log any results");
         
         return options;
@@ -88,16 +89,16 @@ public class PremisPersistenceTest {
         
         List<AbstractPremisPersistenceGenerator> testList = new ArrayList<>();
         for (int i = 0; i < repetitions; i++) {
-            if (cmd.hasOption('R')) {
+            if (cmd.hasOption('R') || cmd.hasOption('A')) {
                 testList.add(new RdfLogGenerator(config));
             }
-            if (cmd.hasOption('O')) {
+            if (cmd.hasOption('O') || cmd.hasOption('A')) {
                 testList.add(new EventObjectsGenerator(config));
             }
-            if (cmd.hasOption('X')) {
+            if (cmd.hasOption('X') || cmd.hasOption('A')) {
                 testList.add(new XmlLogGenerator(config));
             }
-            if (cmd.hasOption('H')) {
+            if (cmd.hasOption('H') || cmd.hasOption('A')) {
                 testList.add(new HashUriEventsGenerator(config));
             }
         }

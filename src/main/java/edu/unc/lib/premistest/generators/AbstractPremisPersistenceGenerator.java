@@ -32,6 +32,8 @@ import org.apache.jena.rdf.model.Resource;
 import org.fcrepo.client.FcrepoClient;
 import org.fcrepo.client.FcrepoOperationFailedException;
 import org.fcrepo.client.FcrepoResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.unc.lib.premistest.PremisPersistenceTest.TestConfig;
 import edu.unc.lib.premistest.premistest.Premis;
@@ -42,6 +44,8 @@ import edu.unc.lib.premistest.premistest.Premis;
  *
  */
 public abstract class AbstractPremisPersistenceGenerator {
+    
+    private static final Logger log = LoggerFactory.getLogger(AbstractPremisPersistenceGenerator.class);
     
     protected static Resource clamAgent = createResource("http://cdr.lib.unc.edu/agent/software/ClamAV");
     
@@ -126,8 +130,8 @@ public abstract class AbstractPremisPersistenceGenerator {
         long total = System.currentTimeMillis() - start;
         
         long perEvent = total / (config.numEvents * config.numObjects);
-        System.out.println(getTestName() + "(events=" + config.numEvents
-                + ", objs=" + config.numObjects + ") = "
-                + total + "ms (" + perEvent + "ms/objEvent)");
+        log.info("{} (events={}, objs={}) = {}ms ({}ms/objEvent)",
+                new Object[] {getTestName(), config.numEvents,
+                        config.numObjects, total, perEvent});
     }
 }

@@ -47,9 +47,8 @@ public class RdfLogGenerator extends AbstractPremisPersistenceGenerator {
 
     @Override
     protected void populateObjects() throws Exception {
-        System.out.println("Populating " + config.numEvents + " " + config.numObjects);
         for (int objCnt = 0; objCnt < config.numObjects; objCnt++) {
-            System.out.println("Obj " + objCnt);
+//            System.out.println("Obj " + objCnt);
             log.debug("Obj {}", objCnt);
             URI objectUri = createPreservedObject();
             
@@ -86,7 +85,7 @@ public class RdfLogGenerator extends AbstractPremisPersistenceGenerator {
                 }
             }
             
-            System.out.println(objectUri);
+//            System.out.println(objectUri);
         }
     }
 
