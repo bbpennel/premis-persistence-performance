@@ -3,3 +3,4 @@ tomcat*
 *.log
 .classpath
 downloads/*
+.settings
