@@ -33,6 +33,9 @@ import org.slf4j.LoggerFactory;
 import edu.unc.lib.premistest.PremisPersistenceTest.TestConfig;
 
 /**
+ * Creates objects which contain a binary storing a RDF log containing all
+ * premis events for the object. Nested properties of the event are stored in
+ * hash uris within the same log file.
  * 
  * @author bbpennel
  *
@@ -40,7 +43,7 @@ import edu.unc.lib.premistest.PremisPersistenceTest.TestConfig;
 public class RdfLogGenerator extends AbstractPremisPersistenceGenerator {
 
     private static final Logger log = LoggerFactory.getLogger(RdfLogGenerator.class);
-    
+
     public RdfLogGenerator(TestConfig config) {
         super(config);
     }
@@ -48,10 +51,9 @@ public class RdfLogGenerator extends AbstractPremisPersistenceGenerator {
     @Override
     protected void populateObjects() throws Exception {
         for (int objCnt = 0; objCnt < config.numObjects; objCnt++) {
-//            System.out.println("Obj " + objCnt);
             log.debug("Obj {}", objCnt);
             URI objectUri = createPreservedObject();
-            
+
             // Create the log object
             URI logUri = null;
             try (FcrepoResponse resp = client.post(objectUri)
@@ -59,13 +61,13 @@ public class RdfLogGenerator extends AbstractPremisPersistenceGenerator {
                     .perform()) {
                 logUri = resp.getLocation();
             }
-            
+
             String logUriString = logUri.toString();
-            
+
             for (int i = 0; i < config.numEvents; i++) {
                 // Retrieve log object
                 String logBody = retrieveRDFLog(logUri);
-                
+
                 // create new entry
                 String eventId = UUID.randomUUID().toString();
                 Resource premisObjResc = createRDFEvent(logUriString + "/event" + eventId);
@@ -74,18 +76,18 @@ public class RdfLogGenerator extends AbstractPremisPersistenceGenerator {
                 try (ByteArrayOutputStream outStream = new ByteArrayOutputStream()) {
                     RDFDataMgr.write(outStream, premisObjResc.getModel(), RDFFormat.TURTLE_PRETTY);
                     String eventString = outStream.toString("UTF-8");
-                    
+
                     logBody += eventString;
                 }
-                
+
                 // Stream log object back to fedora
                 try (FcrepoResponse resp = client.put(logUri)
                         .body(new ByteArrayInputStream(logBody.getBytes()), "text/plain")
                         .perform()) {
                 }
             }
-            
-//            System.out.println(objectUri);
+
+            log.debug("Created {}", objectUri);
         }
     }
 
@@ -95,7 +97,7 @@ public class RdfLogGenerator extends AbstractPremisPersistenceGenerator {
             return IOUtils.toString(resp.getBody());
         }
     }
-    
+
     @Override
     public String getTestName() {
         return "rdf_log";

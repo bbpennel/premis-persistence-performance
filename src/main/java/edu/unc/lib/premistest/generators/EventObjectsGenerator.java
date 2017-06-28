@@ -34,6 +34,10 @@ import edu.unc.lib.premistest.PremisPersistenceTest.TestConfig;
 import edu.unc.lib.premistest.premistest.Premis;
 
 /**
+ * Creates objects containing events represented as individual fedora resources.
+ * They are stored within a ldp:DirectContainer structure to add the
+ * premis:hasEvent relation to the containing object. Nested properties are
+ * stored as hash uris of the event.
  * 
  * @author bbpennel
  *
@@ -48,7 +52,7 @@ public class EventObjectsGenerator extends AbstractPremisPersistenceGenerator {
     protected void populateObjects() throws Exception {
         for (int objCnt = 0; objCnt < config.numObjects; objCnt++) {
             URI objectUri = createPreservedObject();
-            
+
             // Create log direct container
             URI logUri = null;
             Model model = ModelFactory.createDefaultModel();
@@ -59,12 +63,12 @@ public class EventObjectsGenerator extends AbstractPremisPersistenceGenerator {
                     createResource("."));
             containerResc.addProperty(createProperty("http://www.w3.org/ns/ldp#hasMemberRelation"),
                     Premis.hasEvent);
-            
+
             try (ByteArrayOutputStream outStream = new ByteArrayOutputStream()) {
                 RDFDataMgr.write(outStream, containerResc.getModel(), RDFFormat.TURTLE_PRETTY);
                 // System.out.println(outStream.toString("UTF-8"));
                 InputStream inStream = new ByteArrayInputStream(outStream.toByteArray());
-                
+
                 try (FcrepoResponse resp = client.post(objectUri)
                         .slug("event")
                         .body(inStream, "application/x-turtle")
@@ -72,7 +76,7 @@ public class EventObjectsGenerator extends AbstractPremisPersistenceGenerator {
                     logUri = resp.getLocation();
                 }
             }
-            
+
             for (int i = 0; i < config.numEvents; i++) {
                 // Get event rdf resource
                 Resource premisObjResc = createRDFEvent("");
@@ -80,7 +84,7 @@ public class EventObjectsGenerator extends AbstractPremisPersistenceGenerator {
                 try (ByteArrayOutputStream outStream = new ByteArrayOutputStream()) {
                     RDFDataMgr.write(outStream, premisObjResc.getModel(), RDFFormat.TURTLE_PRETTY);
                     InputStream inStream = new ByteArrayInputStream(outStream.toByteArray());
-                    
+
                     // Create event object
                     try (FcrepoResponse resp = client.post(logUri)
                             .slug("event" + i)
@@ -89,14 +93,14 @@ public class EventObjectsGenerator extends AbstractPremisPersistenceGenerator {
                     }
                 }
             }
-            
+
 //            System.out.println(objUri);
         }
     }
 
     @Override
     public String getTestName() {
-        return "event_objects";
+        return "event_resources";
     }
 
 }
