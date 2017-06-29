@@ -22,6 +22,8 @@ import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
@@ -50,6 +52,12 @@ public class PremisPersistenceTest {
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
 
+        if (options.hasOption("h")) {
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("myapp", "Perform PREMIS performance tests", options, null, true);
+            return;
+        }
+
         TestConfig config = extractTestConfig(cmd);
 
         testList(cmd, config).forEach(generator -> {
@@ -66,6 +74,9 @@ public class PremisPersistenceTest {
     private static Options populateOptions() {
         Options options = new Options();
 
+        Option helpOpt = new Option("h", "print this message");
+        helpOpt.setLongOpt("help");
+        options.addOption(helpOpt);
         options.addOption("e", true, "Number of events per object.  Default 1.");
         options.addOption("n", true, "Number of objects per test.  Default 10.");
         options.addOption("u", true, "URL of the Fedora instance to use for testing.  Default http://localhost:8080/rest/");
