@@ -34,6 +34,7 @@ import edu.unc.lib.premistest.generators.EventObjectsGenerator;
 import edu.unc.lib.premistest.generators.HashUriEventsGenerator;
 import edu.unc.lib.premistest.generators.RdfLogGenerator;
 import edu.unc.lib.premistest.generators.XmlLogGenerator;
+import edu.unc.lib.premistest.generators.EventResourcesRelatedObjectGenerator;
 
 /**
  * Main method which processes configuration arguments and initiates performance
@@ -52,9 +53,9 @@ public class PremisPersistenceTest {
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
 
-        if (options.hasOption("h")) {
+        if (cmd.hasOption('h')) {
             HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("myapp", "Perform PREMIS performance tests", options, null, true);
+            formatter.printHelp("premistest", "Perform PREMIS performance tests", options, null, true);
             return;
         }
 
@@ -82,11 +83,13 @@ public class PremisPersistenceTest {
         options.addOption("u", true, "URL of the Fedora instance to use for testing.  Default http://localhost:8080/rest/");
         options.addOption("r", false, "Randomize order of tests.  Default false.");
         options.addOption("R", false, "Run RDF Log File test");
-        options.addOption("O", false, "Run Events as Objects test");
+        options.addOption("O", false, "Run Events as Resources test");
         options.addOption("X", false, "Run XML Log File test");
         options.addOption("H", false, "Run Events as Hash URIs test");
+        options.addOption("I", false, "Run Events as Resources with inverted relation"
+                + " to object using premis:hasRelatedObject test");
         options.addOption("N", true, "Number of times to repeat tests.  Default 1.");
-        options.addOption("A", false, "Run all persistence tests");
+        options.addOption("A", false, "Run all standard persistence tests (O R X H)");
         options.addOption("s", false, "Silent mode, do not log any results");
 
         return options;
@@ -133,6 +136,9 @@ public class PremisPersistenceTest {
             }
             if (cmd.hasOption('H') || cmd.hasOption('A')) {
                 testList.add(new HashUriEventsGenerator(config));
+            }
+            if (cmd.hasOption('I')) {
+                testList.add(new EventResourcesRelatedObjectGenerator(config));
             }
         }
 

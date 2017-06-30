@@ -25,6 +25,7 @@ import java.net.URI;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
@@ -44,6 +45,12 @@ import edu.unc.lib.premistest.premistest.Premis;
  */
 public class EventObjectsGenerator extends AbstractPremisPersistenceGenerator {
 
+    private final static Resource DIRECT_CONTAINER = createResource("http://www.w3.org/ns/ldp#DirectContainer");
+    private final static Property RDF_TYPE = createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+    private final static Property MEM_RESOURCE = createProperty("http://www.w3.org/ns/ldp#membershipResource");
+    private final static Property MEM_RELATION = createProperty("http://www.w3.org/ns/ldp#hasMemberRelation");
+    private final static Resource PARENT_RESC = createResource(".");
+
     public EventObjectsGenerator(TestConfig config) {
         super(config);
     }
@@ -57,12 +64,9 @@ public class EventObjectsGenerator extends AbstractPremisPersistenceGenerator {
             URI logUri = null;
             Model model = ModelFactory.createDefaultModel();
             Resource containerResc = model.createResource("");
-            containerResc.addProperty(createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
-                    createResource("http://www.w3.org/ns/ldp#DirectContainer"));
-            containerResc.addProperty(createProperty("http://www.w3.org/ns/ldp#membershipResource"),
-                    createResource("."));
-            containerResc.addProperty(createProperty("http://www.w3.org/ns/ldp#hasMemberRelation"),
-                    Premis.hasEvent);
+            containerResc.addProperty(RDF_TYPE, DIRECT_CONTAINER);
+            containerResc.addProperty(MEM_RESOURCE, PARENT_RESC);
+            containerResc.addProperty(MEM_RELATION, Premis.hasEvent);
 
             try (ByteArrayOutputStream outStream = new ByteArrayOutputStream()) {
                 RDFDataMgr.write(outStream, containerResc.getModel(), RDFFormat.TURTLE_PRETTY);

@@ -77,6 +77,8 @@ public class Premis {
     
     public static final Property hasEventType = createProperty("http://www.loc.gov/premis/rdf/v1#hasEventType");
     
+    public static final Property hasRelatedObject = createProperty("http://www.loc.gov/premis/rdf/v1#hasRelatedObject");
+    
     public static final Resource File = createResource( "http://www.loc.gov/premis/rdf/v1#File" );
     
     public static final Resource Fixity = createResource( "http://www.loc.gov/premis/rdf/v1#Fixity" );
