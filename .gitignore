@@ -2,5 +2,6 @@ target
 tomcat*
 *.log
 .classpath
+^downloads/.keep
 downloads/*
 .settings
