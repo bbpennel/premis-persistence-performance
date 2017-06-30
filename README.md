@@ -3,7 +3,7 @@ Creation of objects and events are implemented using Java based clients to accur
 Tests are coordinated with shell scripts for ease of use and to keep the fcrepo JVM separate from the test execution.
 
 *For more information using the java testing utility:*
-1) build the project `mvn clean install`
+1) build the project `mvn install`
 2) then run `java -jar target/premistest-0.0.1.jar -h`
 
 Setup Batch Tests
