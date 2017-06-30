@@ -2,6 +2,8 @@
 
 source bin/common.sh
 
+server_check
+
 NUM_EVENTS=10
 NUM_OBJS=10000
 NUM_RUNS=2
